@@ -1,0 +1,23 @@
+subscription_name = "redis-tgw-pro-us-east-1"
+database_name     = "redis-tgw-db"
+
+cloud_provider = "AWS"
+redis_region   = "us-east-1"
+
+dataset_size_in_gb           = 2
+throughput_measurement_value = 1000
+protocol                     = "redis"
+replication                  = false
+
+# Keep this CIDR distinct from the AWS VPC CIDR you attach through TGW.
+redis_deployment_cidr = "192.168.0.0/24"
+
+aws_region  = "us-east-1"
+aws_profile = "replace-with-your-aws-sso-or-named-profile"
+
+name_prefix = "redis-tgw"
+
+aws_vpc_id = "vpc-xxxxxxxxxxxxxxxxx"
+
+# Terraform discovers the VPC CIDR, subnets, and route tables from aws_vpc_id.
+# Optional overrides are available in main.tf for advanced cases.

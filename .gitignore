@@ -1,0 +1,12 @@
+.terraform/
+.DS_Store
+terraform.tfstate
+terraform.tfstate.*
+.terraform.tfstate.lock.info
+terraform.tfvars
+*.tfplan
+*.auto.tfvars
+*.auto.tfvars.json
+crash.log
+crash.*.log
+Icon?
