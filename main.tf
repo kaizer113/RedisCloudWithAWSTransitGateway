@@ -72,14 +72,14 @@ variable "throughput_measurement_value" {
   default     = 1000
 }
 
-variable "protocol" {
-  description = "Protocol for the Redis Cloud database. Valid values are redis or memcached."
-  type        = string
-  default     = "redis"
-}
-
 variable "replication" {
   description = "Whether database replication is enabled."
+  type        = bool
+  default     = false
+}
+
+variable "support_oss_cluster_api" {
+  description = "Whether the Redis database should support the open-source Redis Cluster API."
   type        = bool
   default     = false
 }
@@ -159,6 +159,7 @@ resource "rediscloud_subscription" "pro" {
     dataset_size_in_gb           = var.dataset_size_in_gb
     quantity                     = 1
     replication                  = var.replication
+    support_oss_cluster_api      = var.support_oss_cluster_api
     throughput_measurement_by    = "operations-per-second"
     throughput_measurement_value = var.throughput_measurement_value
   }
@@ -174,8 +175,9 @@ resource "rediscloud_subscription_database" "database" {
   subscription_id              = rediscloud_subscription.pro.id
   name                         = var.database_name
   dataset_size_in_gb           = var.dataset_size_in_gb
-  protocol                     = var.protocol
+  protocol                     = "redis"
   replication                  = var.replication
+  support_oss_cluster_api      = var.support_oss_cluster_api
   data_persistence             = "none"
   throughput_measurement_by    = "operations-per-second"
   throughput_measurement_value = var.throughput_measurement_value
