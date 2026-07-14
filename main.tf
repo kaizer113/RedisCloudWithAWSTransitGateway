@@ -85,9 +85,9 @@ variable "support_oss_cluster_api" {
 }
 
 variable "enable_public_endpoint" {
-  description = "Whether Redis Cloud should expose a public endpoint. Keep false for TGW-only testing."
+  description = "Whether Redis Cloud should expose a public endpoint."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "aws_region" {

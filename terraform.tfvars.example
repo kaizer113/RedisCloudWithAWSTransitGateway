@@ -8,6 +8,7 @@ dataset_size_in_gb           = 2
 throughput_measurement_value = 1000
 replication                  = false
 support_oss_cluster_api      = false
+enable_public_endpoint       = true
 
 # Keep this CIDR distinct from the AWS VPC CIDR you attach through TGW.
 redis_deployment_cidr = "192.168.0.0/24"
