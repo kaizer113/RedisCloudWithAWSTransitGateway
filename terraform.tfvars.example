@@ -26,5 +26,7 @@ aws_resources_name_prefix = "redis-tgw"
 
 aws_vpc_id = "vpc-xxxxxxxxxxxxxxxxx"
 
+redis_tgw_attachment_wait_duration = "180s"
+
 # Terraform discovers the VPC CIDR, subnets, and route tables from aws_vpc_id.
 # Optional overrides are available in main.tf for advanced cases.

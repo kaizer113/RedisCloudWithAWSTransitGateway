@@ -66,6 +66,14 @@ For credit-card accounts, set `payment_method = "credit-card"` and Terraform wil
 
 Terraform discovers the VPC CIDR, subnets, and route tables from `aws_vpc_id`. Optional override variables are available in `main.tf` for advanced cases.
 
+After creating the Redis Cloud TGW attachment, Terraform waits before adding the Redis Cloud consumer CIDRs:
+
+```hcl
+redis_tgw_attachment_wait_duration = "180s"
+```
+
+Increase this value if Redis Cloud reports `TGW_ATTACHMENT_IS_NOT_ACTIVE` while adding consumer CIDRs.
+
 The Redis Cloud producer CIDR defaults to `192.168.0.0/24`; make sure it does not overlap the AWS VPC CIDR.
 
 Apply:

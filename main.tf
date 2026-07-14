@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.7"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.13"
+    }
     rediscloud = {
       source  = "RedisLabs/rediscloud"
       version = "~> 2.18"
@@ -140,6 +144,12 @@ variable "amazon_side_asn" {
   description = "Private ASN for the AWS side of the Transit Gateway."
   type        = number
   default     = 64512
+}
+
+variable "redis_tgw_attachment_wait_duration" {
+  description = "How long to wait after creating the Redis Cloud TGW attachment before adding Redis Cloud consumer CIDRs."
+  type        = string
+  default     = "180s"
 }
 
 resource "random_password" "database" {
@@ -315,54 +325,10 @@ resource "rediscloud_transit_gateway_attachment" "redis" {
   depends_on = [aws_ec2_transit_gateway_vpc_attachment.consumer_vpc]
 }
 
-resource "terraform_data" "wait_for_redis_attachment" {
-  triggers_replace = [
-    rediscloud_transit_gateway_attachment.redis.attachment_uid
-  ]
+resource "time_sleep" "wait_for_redis_attachment" {
+  create_duration = var.redis_tgw_attachment_wait_duration
 
-  provisioner "local-exec" {
-    command = <<-EOT
-      set -eu
-
-      if [ -n "$AWS_PROFILE_VALUE" ]; then
-        export AWS_PROFILE="$AWS_PROFILE_VALUE"
-      fi
-
-      attachment_id="$TGW_ATTACHMENT_ID"
-
-      for attempt in $(seq 1 60); do
-        state="$(aws ec2 describe-transit-gateway-attachments \
-          --region "$AWS_REGION_VALUE" \
-          --transit-gateway-attachment-ids "$attachment_id" \
-          --query 'TransitGatewayAttachments[0].State' \
-          --output text)"
-
-        echo "Redis Cloud TGW attachment $attachment_id state: $state"
-
-        if [ "$state" = "available" ]; then
-          exit 0
-        fi
-
-        case "$state" in
-          failed|deleted|deleting|rejected|rejecting)
-            echo "Redis Cloud TGW attachment $attachment_id reached terminal state: $state" >&2
-            exit 1
-            ;;
-        esac
-
-        sleep 10
-      done
-
-      echo "Timed out waiting for Redis Cloud TGW attachment $attachment_id to become available" >&2
-      exit 1
-    EOT
-
-    environment = {
-      AWS_PROFILE_VALUE = coalesce(var.aws_profile, "")
-      AWS_REGION_VALUE  = var.aws_region
-      TGW_ATTACHMENT_ID = rediscloud_transit_gateway_attachment.redis.attachment_uid
-    }
-  }
+  depends_on = [rediscloud_transit_gateway_attachment.redis]
 }
 
 resource "rediscloud_transit_gateway_route" "consumer_cidrs" {
@@ -370,7 +336,7 @@ resource "rediscloud_transit_gateway_route" "consumer_cidrs" {
   tgw_id          = data.rediscloud_transit_gateway.redis_tgw.tgw_id
   cidrs           = local.consumer_vpc_cidrs
 
-  depends_on = [terraform_data.wait_for_redis_attachment]
+  depends_on = [time_sleep.wait_for_redis_attachment]
 }
 
 resource "aws_route" "redis_producer_cidr" {
