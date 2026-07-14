@@ -6,6 +6,8 @@ redis_region   = "us-east-1"
 
 dataset_size_in_gb           = 2
 throughput_measurement_value = 1000
+
+# Valid values: "redis" or "memcached".
 protocol                     = "redis"
 replication                  = false
 

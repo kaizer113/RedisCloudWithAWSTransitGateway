@@ -73,7 +73,7 @@ variable "throughput_measurement_value" {
 }
 
 variable "protocol" {
-  description = "Protocol for the Redis Cloud database."
+  description = "Protocol for the Redis Cloud database. Valid values are redis or memcached."
   type        = string
   default     = "redis"
 }
