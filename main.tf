@@ -24,7 +24,7 @@ provider "aws" {
 
 provider "rediscloud" {}
 
-variable "name_prefix" {
+variable "aws_resources_name_prefix" {
   description = "Prefix used for AWS resource names."
   type        = string
   default     = "redis-tgw"
@@ -81,7 +81,7 @@ variable "replication" {
 variable "support_oss_cluster_api" {
   description = "Whether the Redis database should support the open-source Redis Cluster API."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "enable_public_endpoint" {
@@ -236,16 +236,16 @@ resource "aws_ec2_transit_gateway" "redis" {
   vpn_ecmp_support                = "enable"
 
   tags = {
-    Name = var.name_prefix
+    Name = var.aws_resources_name_prefix
   }
 }
 
 resource "aws_ram_resource_share" "redis_tgw" {
-  name                      = "${var.name_prefix}-ram-share"
+  name                      = "${var.aws_resources_name_prefix}-ram-share"
   allow_external_principals = true
 
   tags = {
-    Name = "${var.name_prefix}-ram-share"
+    Name = "${var.aws_resources_name_prefix}-ram-share"
   }
 }
 
@@ -290,7 +290,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "consumer_vpc" {
   dns_support        = "enable"
 
   tags = {
-    Name = "${var.name_prefix}-consumer-vpc"
+    Name = "${var.aws_resources_name_prefix}-consumer-vpc"
   }
 }
 
