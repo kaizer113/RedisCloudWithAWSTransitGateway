@@ -4,6 +4,12 @@ database_name     = "redis-tgw-db"
 cloud_provider = "AWS"
 redis_region   = "us-east-1"
 
+payment_method = "marketplace"
+# For credit-card accounts, use:
+# payment_method = "credit-card"
+# For direct-contract accounts that do not require a payment method, use:
+# payment_method = null
+
 dataset_size_in_gb           = 2
 throughput_measurement_value = 1000
 replication                  = false

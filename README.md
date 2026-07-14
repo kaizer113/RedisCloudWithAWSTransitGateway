@@ -56,6 +56,14 @@ cp terraform.tfvars.example terraform.tfvars
 
 Edit `terraform.tfvars` with the Redis Cloud names/settings, AWS profile, AWS resource name prefix, and `aws_vpc_id`.
 
+Marketplace billing is the default:
+
+```hcl
+payment_method = "marketplace"
+```
+
+For credit-card accounts, set `payment_method = "credit-card"` and Terraform will query the configured Redis Cloud payment method. For direct-contract accounts that do not require a payment method, set `payment_method = null`.
+
 Terraform discovers the VPC CIDR, subnets, and route tables from `aws_vpc_id`. Optional override variables are available in `main.tf` for advanced cases.
 
 The Redis Cloud producer CIDR defaults to `192.168.0.0/24`; make sure it does not overlap the AWS VPC CIDR.

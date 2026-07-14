@@ -48,6 +48,17 @@ variable "cloud_provider" {
   default     = "AWS"
 }
 
+variable "payment_method" {
+  description = "Redis Cloud payment method. Use marketplace for Marketplace accounts, credit-card for card billing, or null for direct contracts that do not require a payment method."
+  type        = string
+  default     = "marketplace"
+
+  validation {
+    condition     = var.payment_method == null || contains(["marketplace", "credit-card"], var.payment_method)
+    error_message = "payment_method must be marketplace, credit-card, or null."
+  }
+}
+
 variable "redis_region" {
   description = "Cloud provider region for the Redis Cloud Pro subscription."
   type        = string
@@ -136,11 +147,14 @@ resource "random_password" "database" {
   special = false
 }
 
-data "rediscloud_payment_method" "current" {}
+data "rediscloud_payment_method" "current" {
+  count = var.payment_method == "credit-card" ? 1 : 0
+}
 
 resource "rediscloud_subscription" "pro" {
   name                   = var.subscription_name
-  payment_method_id      = data.rediscloud_payment_method.current.id
+  payment_method         = var.payment_method
+  payment_method_id      = var.payment_method == "credit-card" ? data.rediscloud_payment_method.current[0].id : null
   memory_storage         = "ram"
   public_endpoint_access = var.enable_public_endpoint
 
